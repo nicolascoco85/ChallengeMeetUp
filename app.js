@@ -1,4 +1,3 @@
-var logger = require("morgan");
 var indexRouter = require("./routes/index");
 var createError = require("http-errors");
 var express = require("express");
