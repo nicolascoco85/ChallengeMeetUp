@@ -14,19 +14,7 @@ app.get('/', (request, response) => {
     });
 });
 
-/*app.get('/clima', async (request, response) => {
-    if (service.esDiaValido(request)){
-        response.json(await service.obtenerClima(request.query.dia));
-    } else {
-        response.status(400).send({
-            message:'El dia ingresado es invalido'
-        });
-    }
-});
 
-app.get('/reporte', async (request, response) => {
-    response.json(await service.obtenerReporte());
-});*/
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log("Escuchando en localhost:"+port);
