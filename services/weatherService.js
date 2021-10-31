@@ -1,34 +1,32 @@
 const http = require("https");
 const config = require ("../config/config")
 
-const options = {
-    "method": "GET",
-    "hostname": "weatherbit-v1-mashape.p.rapidapi.com",
-    "port": null,
-    "path": "/current?lon=-58.3&lat=-34.6&units=metric&lang=es",
-    "headers": {
-        "x-rapidapi-host": "weatherbit-v1-mashape.p.rapidapi.com",
-        "x-rapidapi-key": config.TOKEN_WEATHER,
-        "useQueryString": true
+const axios = require("axios").default;
+
+var options = {
+    method: 'GET',
+    url: 'https://weatherbit-v1-mashape.p.rapidapi.com/forecast/daily',
+    params: { units: 'metric', lang: 'es'},
+    headers: {
+        'x-rapidapi-host': 'weatherbit-v1-mashape.p.rapidapi.com',
+        'x-rapidapi-key': config.TOKEN_WEATHER
     }
 };
 
 
 module.exports = {
-    getClima: function () {
+    getClima: function (fecha,geoCoord) {
         let promise = new Promise( (resolve, reject) => {
-            const req = http.request(options, function (res) {
-                const chunks = [];
-                res.on("data", function (chunk) {
-                    chunks.push(chunk);
-                });
-                res.on("end", function () {
-                    const body = Buffer.concat(chunks);
-                    const temp = JSON.parse(body.toString())
-                    resolve(temp.data[0].temp);
-                });
+            options.params.lon = geoCoord.lon;
+            options.params.lat = geoCoord.lat;
+            axios.request(options).then(function (response) {
+                const date = response.data.data.find(dia => dia.valid_date === fecha)
+                console.log(date);
+                resolve(date.temp)
+            }).catch(function (error) {
+                console.error(error);
+                reject(error)
             });
-           req.end();
         });
             return promise;
     }};
