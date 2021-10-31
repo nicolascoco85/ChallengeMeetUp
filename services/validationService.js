@@ -16,8 +16,18 @@ function isValidDate(date) {
     return false; // out range date
 }
 
+function isFutureDay(fechaEvento){
+    const fechaHoy = new Date();
+    const fechaHoyFormated = fechaHoy.toISOString().substring(0, 10);
+
+    return moment(fechaEvento).isAfter(fechaHoyFormated);
+}
+
 module.exports = {
     isValidDate: function (data) {
         return isValidDate(data);
     },
+    isFutureDay: function (fechaEvento){
+        return isFutureDay(fechaEvento)
+    }
 };
