@@ -5,6 +5,8 @@ const DB = require('../models/database');
 const weatherService = require('../services/weatherService')
 const validationService = require('../services/validationService')
 const meetUpService = require('../services/meetUpService')
+const userService = require('../services/userService')
+const proovedorService = require('../services/proveedorService')
 
 
 app.use(bodyParser.urlencoded({
@@ -47,7 +49,7 @@ app.post('/meetup', async(req, res) => {
     if (validationService.isFutureDay(fecha)) {
         try {
             await meetUpService.create(name,fecha);
-             res.json({stated:"Created"})
+             res.json({state:"Created"})
         } catch (error) {
             res.status(400).send({
                 message: "Out range date value " + fecha,
@@ -58,9 +60,78 @@ app.post('/meetup', async(req, res) => {
             message: "Out range date value " + fecha,
         });
     }
+});
 
+app.post('/user', async(req, res) => {
+    console.log(req.body.user)
+    console.log(req.body.password)
+    console.log(req.body.role)
+    const password = req.body.password
+    const user = req.body.user
+    const role = req.body.role
 
+    if (user && password ) {
+        try {
+            await userService.create(user,password,role);
+            res.json({state:"Created"})
+        } catch (error) {
+            res.status(400).send({
+                message: "Out range date value " + user,
+            });
+        }
+    } else {
+        return res.status(400).send({
+            message: "Out range date value " + fecha,
+        });
+    }
+});
 
+app.get('/meetup/', async(req, res) => {
+    console.log(req.query.id)
+    const id =req.query.id
+    const geoCoordBsAs = {lon:-58.3, lat:-34.6}
+    if (id) {
+        try {
+            const meetup = await meetUpService.getMeetUp(id);
+            console.log(meetup.date);
+            const temp = await weatherService.getClima(meetup.date,geoCoordBsAs);
+            const boxBeers = proovedorService.ObtenerNumeroDeCajas(meetup.invitations, temp)
+            res.json({NumberBoxBeer: boxBeers})
+        } catch (error) {
+            res.status(400).send({
+                message: "invalid id meet up " + id,
+            });
+        }
+    } else {
+        return res.status(400).send({
+            message: "invalid id meet up " + id,
+        });
+    }
+});
+
+app.put('/meetup/:id/join', async(req, res) => {
+    console.log(req.params.id);
+    console.log(req.body.userId);
+
+    const idMeetUp = req.params.id;
+    const idUser = req.body.userId;
+    const meetUp = await meetUpService.getMeetUp(idMeetUp);
+    const user = await userService.getUser(idUser);
+    if (user && meetUp ) {
+        try {
+            meetUp.guestUserIds.push(idUser);
+            await meetUp.save();
+            res.json({state:"Joined"})
+        } catch (error) {
+            res.status(400).send({
+                message: "Out range date value " + user,
+            });
+        }
+    } else {
+        return res.status(400).send({
+            message: "Error join meetup " + idMeetUp +"--"+ idUser,
+        });
+    }
 });
 
 

@@ -3,9 +3,9 @@ const Schema = mongoose.Schema;
 
 
 let MeetUpSchema = new Schema({
-    date: { type: Date, default: Date.now },
+    date: { type: String, default: "2021-01-01" },
     name: { type: String, default: 0 },
-    invitations: { type: Number, default: 0 },
+    guestUserIds: [String],
     city: { type: String, default: "BS AS" },
 });
 

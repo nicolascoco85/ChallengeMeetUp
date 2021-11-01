@@ -17,9 +17,8 @@ module.exports = {
         }
     },
     getMeetUp: async function (meetUpId) {
-        const meetup = await MeetUp.find({
-            id: meetUpId,
-        });
+        const meetup = await MeetUp.findById(meetUpId
+        );
         return meetup;
     }
 };
