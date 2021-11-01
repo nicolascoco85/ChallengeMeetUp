@@ -17,8 +17,10 @@ function GetLatasDeCerveza(personas, proporcion){
 }
 
 function GetCajasdeCervezas(latas) {
-    return Math.round(latas / 6);
+    let cajas = Math.ceil(latas / 6);
+    return cajas;
 }
+
 
 
 module.exports = {

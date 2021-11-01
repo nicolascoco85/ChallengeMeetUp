@@ -95,7 +95,7 @@ app.get('/meetup/', async(req, res) => {
             const meetup = await meetUpService.getMeetUp(id);
             console.log(meetup.date);
             const temp = await weatherService.getClima(meetup.date,geoCoordBsAs);
-            const boxBeers = proovedorService.ObtenerNumeroDeCajas(meetup.invitations, temp)
+            const boxBeers = proovedorService.ObtenerNumeroDeCajas(meetup.guestUserIds.length, temp)
             res.json({NumberBoxBeer: boxBeers})
         } catch (error) {
             res.status(400).send({
