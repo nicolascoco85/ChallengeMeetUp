@@ -36,7 +36,7 @@ async function getBeer(req, res) {
 app.use(bodyParser.urlencoded({
     extended: true
 }));
-app.use(express.json())
+
 
 app.get('/', (request, response) => {
     response.json({
