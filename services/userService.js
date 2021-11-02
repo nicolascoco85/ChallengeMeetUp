@@ -22,5 +22,12 @@ module.exports = {
         const user = await User.findById(userId
         );
         return user;
+    },
+
+    getUserByNameAndPass: async function (name, pass) {
+
+        const user = await User.findOne({ user: name, password: pass });
+        return user;
     }
+
 };
