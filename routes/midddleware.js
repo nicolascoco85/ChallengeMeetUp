@@ -7,6 +7,7 @@ exports.ensureAuthenticated = (req, res, next) => {
   }
 
   const token = req.headers.authorization.split(" ")[1];
+
   const payload = jwt.decode(token, config.TOKEN_SECRET);
 
   if (payload.sub !== config.FRONT_END_NAME) {

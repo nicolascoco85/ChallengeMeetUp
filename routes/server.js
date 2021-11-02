@@ -7,7 +7,30 @@ const validationService = require('../services/validationService')
 const meetUpService = require('../services/meetUpService')
 const userService = require('../services/userService')
 const proovedorService = require('../services/proveedorService')
+const middleware = require("../routes/midddleware");
 
+async function getBeer(req, res) {
+    console.log(req.query.id)
+    const id =req.query.id
+    const geoCoordBsAs = {lon:-58.3, lat:-34.6}
+    if (id) {
+        try {
+            const meetup = await meetUpService.getMeetUp(id);
+            console.log(meetup.date);
+            const temp = await weatherService.getClima(meetup.date,geoCoordBsAs);
+            const boxBeers = proovedorService.ObtenerNumeroDeCajas(meetup.guestUserIds.length, temp)
+            res.json({NumberBoxBeer: boxBeers})
+        } catch (error) {
+            res.status(400).send({
+                message: "invalid id meet up " + id,
+            });
+        }
+    } else {
+        return res.status(400).send({
+            message: "invalid id meet up " + id,
+        });
+    }
+}
 
 app.use(bodyParser.urlencoded({
     extended: true
@@ -86,7 +109,8 @@ app.post('/user', async(req, res) => {
     }
 });
 
-app.get('/meetup/', async(req, res) => {
+app.route("/meetup/").get(middleware.ensureAuthenticated, getBeer
+/*app.get('/meetup/', async(req, res) => {
     console.log(req.query.id)
     const id =req.query.id
     const geoCoordBsAs = {lon:-58.3, lat:-34.6}
@@ -107,7 +131,8 @@ app.get('/meetup/', async(req, res) => {
             message: "invalid id meet up " + id,
         });
     }
-});
+})*/
+);
 
 app.put('/meetup/:id/join', async(req, res) => {
     console.log(req.params.id);
