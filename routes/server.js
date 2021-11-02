@@ -8,6 +8,7 @@ const meetUpService = require('../services/meetUpService')
 const userService = require('../services/userService')
 const proovedorService = require('../services/proveedorService')
 const middleware = require("../routes/midddleware");
+const config = require("../config/config")
 
 async function getBeer(req, res) {
     console.log(req.query.id)
@@ -62,6 +63,82 @@ app.get('/clima/', async (request, response) => {
 
 
 });
+
+
+
+app.post('/meetup', async(req, res) => {
+    console.log(req.body.date)
+    console.log(req.body.name)
+    const fecha = req.body.date.toString()
+    const name = req.body.name.toString()
+
+    if (validationService.isFutureDay(fecha)) {
+        try {
+            await meetUpService.create(name,fecha);
+            res.json({state:"Created"})
+        } catch (error) {
+            res.status(400).send({
+                message: "Out range date value " + fecha,
+            });
+        }
+    } else {
+        return res.status(400).send({
+            message: "Out range date value " + fecha,
+        });
+    }
+});
+
+app.get('/user/:id', async(req, res) => {
+    console.log(req.params.id);
+
+    const idUser = req.params.id;
+
+    const user = await userService.getUser(idUser);
+    if (user) {
+        try {
+             res.json({
+                 username: user.user,
+                 pass: user.password,
+                 token: user.role =="ADMIN" ? config.TOKEN_SECRET_JWT :"query user"
+             })
+        } catch (error) {
+            res.status(400).send({
+                message: "No exist user id" + idUser,
+            });
+        }
+    } else {
+        return res.status(400).send({
+            message: "Error join meetup " + idMeetUp +"--"+ idUser,
+        });
+    }
+});
+
+app.post('/user/query', async(req, res) => {
+
+    const password = req.body.password
+    const user = req.body.user
+
+    if (user && password ) {
+        try {
+            let result = await userService.getUserByNameAndPass(user,password);
+            res.json({
+                username: result.user,
+                pass: result.password,
+                token: result.role.toString().toUpperCase() =="ADMIN" ? config.TOKEN_SECRET_JWT :"No token, you are query user"
+            })
+        } catch (error) {
+            res.status(400).send({
+                message: "Out range date value " + user,
+            });
+        }
+    } else {
+        return res.status(400).send({
+            message: "Out range date value " + fecha,
+        });
+    }
+});
+
+
 
 app.post('/meetup', async(req, res) => {
     console.log(req.body.date)
